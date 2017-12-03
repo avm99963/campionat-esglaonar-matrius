@@ -25,6 +25,11 @@ namespace console {
     void reduceMatrix();
     void compMatrices();
     void displayMatrix();
+    void checkMatrix(matrix mat1, int &i);
+    void displayTournamentMenu();
+    void displayMatrixInVar(const matrix &mt);
+    void tournamentMenu(const matrix &mt, bool &showmenu, int &i);
+    void startTournamentMode();
 }
 
 #endif  // __CONSOLE_HPP__

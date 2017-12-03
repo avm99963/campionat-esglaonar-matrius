@@ -39,7 +39,7 @@ namespace console {
         cout << endl;
 
         // Make sure to add your name if you were part of it as well!
-        cout << "This program has been developed by David Batet." << endl;
+        cout << "This program has been developed by David Batet and a little bit by Adrià Vilanova." << endl;
         cout << "Please report any bugs found to him." << endl;
         cout << "Source code available at https://github.com/DavidBatet/campionat-esglaonar-matrius" << endl;
         cout << endl;
@@ -204,7 +204,8 @@ namespace console {
         cout << "4. Reduce matrix" << endl;
         cout << "5. Compare matrices" << endl;
         cout << "6. Display matrix" << endl;
-        cout << "7. Exit" << endl;        
+        cout << "7. Tournament mode" << endl;
+        cout << "8. Exit" << endl;
         cout << endl;
         cout << "───────────────────────" << endl;
         cout << "Option: ";
@@ -232,7 +233,7 @@ namespace console {
         int option;
 
         displayMenu();
-        while (not getInput(option, 1, 7)) {
+        while (not getInput(option, 1, 8)) {
             clear();
             displayMenu();
         }
@@ -243,7 +244,8 @@ namespace console {
         else if (option == 4) reduceMatrix();
         else if (option == 5) compMatrices();
         else if (option == 6) displayMatrix();
-        else if (option == 7) exit(0);
+        else if (option == 7) startTournamentMode();
+        else if (option == 8) exit(0);
     }
 
     // Generates a random matrix with integer solutions and saves it the user wants to
@@ -281,7 +283,7 @@ namespace console {
         wait();
         clear();
     }
-	
+
     // Generates a random matrix and saves it the user wants to
     void genMatrix() {
         int m, n;
@@ -311,7 +313,7 @@ namespace console {
         wait();
         clear();
     }
-    
+
     void inputMatrixToFile() {
         displayHeader("Input matrix to file");
 
@@ -368,9 +370,7 @@ namespace console {
         if (mat1 == mat2) {
             cout << "The matrices have the same reduced row echelon form:" << endl;
             cout << mat1 << endl;
-        }
-
-        else {
+        } else {
             cout << "The matrices have different reduced row echelon forms: " << endl;
             cout << endl;
             cout << "Reduced row echelon form of matrix 1: " << endl;
@@ -392,6 +392,121 @@ namespace console {
         cout << mat << endl;
 
         wait();
+        clear();
+    }
+
+    // Checks if matrix is well row-reduced
+    void checkMatrix(matrix mat1, int &i) {
+        displayHeader("Check matrix");
+
+        // Request the participant's matrix
+        cout << "Input the participant's row-reduced matrix in the correct format: " << endl << endl;
+        matrix mat2(cin);
+
+        cout << endl;
+
+        // Prompt to enter the participant intials
+        cout << "Enter the matrix name (it will be saved as {matrix_name}" << i << ".mt): ";
+
+        string matrixName;
+        cin >> matrixName;
+
+        // Save the matrix
+        string filename = matrixName+to_string(i)+".mt";
+        ofstream os(filename);
+        os << mat2.getColSize() << " " << mat2.getRowSize() << endl << endl;
+        os << mat2 << endl;
+
+        ++i;
+
+        clear();
+
+        // Show the results
+        cout << endl;
+        cout << "Original matrix: " << endl;
+        cout << mat1 << endl;
+        cout << "Participant's matrix (saved as "+filename+"): " << endl;
+        cout << mat2 << endl;
+        cout << endl;
+
+        mat1.reduce();
+        mat2.reduce();
+
+        cout << "Solution judged: ";
+
+        if (mat1 == mat2) {
+            cout << "\x1b[32mCORRECT\u001b[0m" << endl << endl;
+            cout << "The matrices have the same reduced row echelon form:" << endl;
+            cout << mat1 << endl;
+        } else {
+            cout << "\x1b[31mINCORRECT\u001b[0m" << endl << endl;
+            cout << "The matrices have different reduced row echelon forms: " << endl;
+            cout << endl;
+            cout << "Reduced row echelon form of matrix 1: " << endl;
+            cout << mat1 << endl;
+            cout << "Reduced row echelon form of matrix 2: " << endl;
+            cout << mat2 << endl;
+        }
+
+        wait();
+        clear();
+    }
+
+    // Displays the tournament mode menu
+    void displayTournamentMenu() {
+        cout << "═══════════════════════════" << endl;
+        cout << "  TOURNAMENT MODE OPTIONS  " << endl;
+        cout << "═══════════════════════════" << endl;
+        cout << endl;
+        cout << "1. Display original matrix" << endl;
+        cout << "2. Check matrix" << endl;
+        cout << "3. Exit" << endl;
+        cout << endl;
+        cout << "───────────────────────" << endl;
+        cout << "Option: ";
+    }
+
+    // Displays the matrix in a variable
+    void displayMatrixInVar(const matrix &mt) {
+        displayHeader("Display matrix");
+
+        cout << mt << endl;
+
+        wait();
+        clear();
+    }
+
+    // Shows the tournament menu
+    void tournamentMenu(const matrix &mt, bool &showmenu, int &i) {
+        int option;
+
+        displayTournamentMenu();
+        while (not getInput(option, 1, 3)) {
+            clear();
+            displayTournamentMenu();
+        }
+
+        if (option == 1) displayMatrixInVar(mt);
+        else if (option == 2) checkMatrix(mt, i);
+        else if (option == 3) showmenu = false;
+    }
+
+    // Starts tournament mode
+    void startTournamentMode() {
+        matrix mat1; // The original matrix
+
+        displayHeader("Tournament Mode");
+
+        cout << "Before entering Tournament Mode, you should have generated a matrix using the options 2 or 3 of the main menu. Enter its name below." << endl << endl;
+
+        getMatrixFromInput(mat1);
+        clear();
+
+        int i = 0;
+        bool showmenu = true;
+
+        while (showmenu) tournamentMenu(mat1, showmenu, i);
+
         clear();
     }
 }
